@@ -1,0 +1,119 @@
+{
+  "category": "pipe_fryum",
+  "total_candidates": 300,
+  "total_accepted": 120,
+  "rejected_by": {
+    "no_defect": 154
+  },
+  "accepted_M_mean": 0.8486313121514573,
+  "accepted_M_std": 0.08236697058086068,
+  "accepted_score_mean": 0.9974007243162966,
+  "accepted_mask_cov_mean": 0.010213669032266694,
+  "per_ref": [
+    {
+      "sample": "train/good/380.png",
+      "kind": "blind_defect",
+      "evaluated": 20,
+      "accepted": 8,
+      "m_accept_final": 0.35688978965127643
+    },
+    {
+      "sample": "train/good/234.png",
+      "kind": "blind_defect",
+      "evaluated": 20,
+      "accepted": 8,
+      "m_accept_final": 0.35688978965127643
+    },
+    {
+      "sample": "train/good/136.png",
+      "kind": "blind_defect",
+      "evaluated": 20,
+      "accepted": 8,
+      "m_accept_final": 0.35688978965127643
+    },
+    {
+      "sample": "train/good/240.png",
+      "kind": "blind_defect",
+      "evaluated": 20,
+      "accepted": 8,
+      "m_accept_final": 0.35688978965127643
+    },
+    {
+      "sample": "train/good/013.png",
+      "kind": "blind_defect",
+      "evaluated": 20,
+      "accepted": 8,
+      "m_accept_final": 0.35688978965127643
+    },
+    {
+      "sample": "train/good/160.png",
+      "kind": "blind_defect",
+      "evaluated": 20,
+      "accepted": 8,
+      "m_accept_final": 0.35688978965127643
+    },
+    {
+      "sample": "train/good/034.png",
+      "kind": "blind_defect",
+      "evaluated": 20,
+      "accepted": 8,
+      "m_accept_final": 0.35688978965127643
+    },
+    {
+      "sample": "train/good/379.png",
+      "kind": "blind_defect",
+      "evaluated": 20,
+      "accepted": 8,
+      "m_accept_final": 0.35688978965127643
+    },
+    {
+      "sample": "train/good/205.png",
+      "kind": "blind_defect",
+      "evaluated": 20,
+      "accepted": 8,
+      "m_accept_final": 0.35688978965127643
+    },
+    {
+      "sample": "train/good/434.png",
+      "kind": "blind_defect",
+      "evaluated": 20,
+      "accepted": 8,
+      "m_accept_final": 0.35688978965127643
+    },
+    {
+      "sample": "train/good/273.png",
+      "kind": "blind_defect",
+      "evaluated": 20,
+      "accepted": 8,
+      "m_accept_final": 0.35688978965127643
+    },
+    {
+      "sample": "train/good/067.png",
+      "kind": "blind_defect",
+      "evaluated": 20,
+      "accepted": 8,
+      "m_accept_final": 0.35688978965127643
+    },
+    {
+      "sample": "train/good/309.png",
+      "kind": "blind_defect",
+      "evaluated": 20,
+      "accepted": 8,
+      "m_accept_final": 0.35688978965127643
+    },
+    {
+      "sample": "train/good/059.png",
+      "kind": "blind_defect",
+      "evaluated": 20,
+      "accepted": 8,
+      "m_accept_final": 0.35688978965127643
+    },
+    {
+      "sample": "train/good/440.png",
+      "kind": "blind_defect",
+      "evaluated": 20,
+      "accepted": 8,
+      "m_accept_final": 0.35688978965127643
+    }
+  ]
+}

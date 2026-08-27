@@ -1,0 +1,26 @@
+{
+  "category": "bottle",
+  "total_candidates": 20,
+  "total_accepted": 16,
+  "rejected_by": {},
+  "accepted_M_mean": 1.299782521787433,
+  "accepted_M_std": 0.06339826517097732,
+  "accepted_score_mean": 0.9825404942035675,
+  "accepted_mask_cov_mean": 0.16765918731689453,
+  "per_ref": [
+    {
+      "sample": "train/good/203.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.716562750957474
+    },
+    {
+      "sample": "train/good/090.png",
+      "kind": "blind_defect",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.8009161367391165
+    }
+  ]
+}

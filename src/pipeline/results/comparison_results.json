@@ -1,0 +1,26 @@
+{
+  "Baseline (700ep)": {
+    "Image AUROC": 0.987,
+    "Image AP": 0.995,
+    "Pixel AUROC": 0.989,
+    "Pixel AP": 0.88
+  },
+  "Baseline (200ep)": {
+    "Image AUROC": 0.963,
+    "Image AP": 0.981,
+    "Pixel AUROC": 0.973,
+    "Pixel AP": 0.839
+  },
+  "Random Aug (200ep)": {
+    "Image AUROC": 0.971,
+    "Image AP": 0.986,
+    "Pixel AUROC": 0.983,
+    "Pixel AP": 0.864
+  },
+  "Missing Boundary (200ep)": {
+    "Image AUROC": 0.971,
+    "Image AP": 0.992,
+    "Pixel AUROC": 0.95,
+    "Pixel AP": 0.754
+  }
+}

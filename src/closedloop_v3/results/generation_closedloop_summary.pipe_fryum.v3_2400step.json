@@ -1,0 +1,28 @@
+{
+  "category": "pipe_fryum",
+  "total_candidates": 20,
+  "total_accepted": 16,
+  "rejected_by": {
+    "no_defect": 1
+  },
+  "accepted_M_mean": 1.3491950287605328,
+  "accepted_M_std": 0.0712449290306657,
+  "accepted_score_mean": 0.996542961973893,
+  "accepted_mask_cov_mean": 0.002490997314453125,
+  "per_ref": [
+    {
+      "sample": "train/good/380.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/234.png",
+      "kind": "blind_defect",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6335217075496756
+    }
+  ]
+}

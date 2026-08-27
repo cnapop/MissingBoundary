@@ -1,0 +1,14 @@
+{
+  "label": "L2",
+  "checkpoint_path": "outputs/fix2_clean/pipe_fryum/checkpoints/fix2",
+  "n_test_images": 150,
+  "n_anomaly_images": 100,
+  "gt_anomaly_pixel_seg_mean": 0.09012143313884735,
+  "gt_normal_pixel_seg_mean": 0.010280952788889408,
+  "background_floor": 0.010280952788889408,
+  "separation_cohens_d": 0.9366094458212976,
+  "separation_ratio_mean": 8.765864372253418,
+  "all_pixel_seg_global_mean": 0.010210542008280754,
+  "img_seg_max_mean": 0.254704087972641,
+  "img_seg_max_max": 0.9660173654556274
+}

@@ -1,0 +1,49 @@
+{
+  "category": "candle",
+  "total_candidates": 60,
+  "total_accepted": 40,
+  "rejected_by": {
+    "no_defect": 5
+  },
+  "accepted_M_mean": 1.4032148505645714,
+  "accepted_M_std": 0.33121793607965144,
+  "accepted_score_mean": 0.9987550442869013,
+  "accepted_mask_cov_mean": 0.002537259188565341,
+  "per_ref": [
+    {
+      "sample": "train/good/511.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.7475168921648649
+    },
+    {
+      "sample": "train/good/072.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.7475168921648649
+    },
+    {
+      "sample": "train/good/468.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.7475168921648649
+    },
+    {
+      "sample": "train/good/311.png",
+      "kind": "blind_defect",
+      "evaluated": 20,
+      "accepted": 8,
+      "m_accept_final": 0.7444391478690248
+    },
+    {
+      "sample": "train/good/079.png",
+      "kind": "blind_defect",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.7444391478690248
+    }
+  ]
+}

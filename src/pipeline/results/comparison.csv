@@ -1,0 +1,5 @@
+Method,Image AUROC,Image AP,Pixel AUROC,Pixel AP
+Baseline (700ep),0.987,0.995,0.989,0.88
+Baseline (200ep),0.963,0.981,0.973,0.839
+Random Aug (200ep),0.971,0.986,0.983,0.864
+Missing Boundary (200ep),0.971,0.992,0.95,0.754

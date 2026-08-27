@@ -1,0 +1,434 @@
+{
+  "category": "pipe_fryum",
+  "total_candidates": 750,
+  "total_accepted": 480,
+  "rejected_by": {
+    "no_defect": 154
+  },
+  "accepted_M_mean": 1.2640840313209876,
+  "accepted_M_std": 0.1042524164021281,
+  "accepted_score_mean": 0.9979808514550228,
+  "accepted_mask_cov_mean": 0.002500623664599937,
+  "per_ref": [
+    {
+      "sample": "train/good/380.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/234.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/136.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/240.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/013.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/160.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/034.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/205.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/379.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/434.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/273.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/067.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/059.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/309.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/440.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/363.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/428.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/414.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/057.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/026.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/391.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/044.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/061.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/304.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/348.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/393.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/290.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/248.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/239.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/082.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/019.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/037.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/149.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/222.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/293.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/352.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/358.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/111.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/435.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/323.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/231.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/317.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/214.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/413.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/415.png",
+      "kind": "boundary_normal",
+      "evaluated": 10,
+      "accepted": 8,
+      "m_accept_final": 0.6032720061000648
+    },
+    {
+      "sample": "train/good/380.png",
+      "kind": "blind_defect",
+      "evaluated": 20,
+      "accepted": 8,
+      "m_accept_final": 0.6335217075496756
+    },
+    {
+      "sample": "train/good/234.png",
+      "kind": "blind_defect",
+      "evaluated": 20,
+      "accepted": 8,
+      "m_accept_final": 0.6335217075496756
+    },
+    {
+      "sample": "train/good/136.png",
+      "kind": "blind_defect",
+      "evaluated": 20,
+      "accepted": 8,
+      "m_accept_final": 0.6335217075496756
+    },
+    {
+      "sample": "train/good/240.png",
+      "kind": "blind_defect",
+      "evaluated": 20,
+      "accepted": 8,
+      "m_accept_final": 0.6335217075496756
+    },
+    {
+      "sample": "train/good/013.png",
+      "kind": "blind_defect",
+      "evaluated": 20,
+      "accepted": 8,
+      "m_accept_final": 0.6335217075496756
+    },
+    {
+      "sample": "train/good/160.png",
+      "kind": "blind_defect",
+      "evaluated": 20,
+      "accepted": 8,
+      "m_accept_final": 0.6335217075496756
+    },
+    {
+      "sample": "train/good/034.png",
+      "kind": "blind_defect",
+      "evaluated": 20,
+      "accepted": 8,
+      "m_accept_final": 0.6335217075496756
+    },
+    {
+      "sample": "train/good/205.png",
+      "kind": "blind_defect",
+      "evaluated": 20,
+      "accepted": 8,
+      "m_accept_final": 0.6335217075496756
+    },
+    {
+      "sample": "train/good/379.png",
+      "kind": "blind_defect",
+      "evaluated": 20,
+      "accepted": 8,
+      "m_accept_final": 0.6335217075496756
+    },
+    {
+      "sample": "train/good/434.png",
+      "kind": "blind_defect",
+      "evaluated": 20,
+      "accepted": 8,
+      "m_accept_final": 0.6335217075496756
+    },
+    {
+      "sample": "train/good/273.png",
+      "kind": "blind_defect",
+      "evaluated": 20,
+      "accepted": 8,
+      "m_accept_final": 0.6335217075496756
+    },
+    {
+      "sample": "train/good/067.png",
+      "kind": "blind_defect",
+      "evaluated": 20,
+      "accepted": 8,
+      "m_accept_final": 0.6335217075496756
+    },
+    {
+      "sample": "train/good/059.png",
+      "kind": "blind_defect",
+      "evaluated": 20,
+      "accepted": 8,
+      "m_accept_final": 0.6335217075496756
+    },
+    {
+      "sample": "train/good/309.png",
+      "kind": "blind_defect",
+      "evaluated": 20,
+      "accepted": 8,
+      "m_accept_final": 0.6335217075496756
+    },
+    {
+      "sample": "train/good/440.png",
+      "kind": "blind_defect",
+      "evaluated": 20,
+      "accepted": 8,
+      "m_accept_final": 0.6335217075496756
+    }
+  ]
+}

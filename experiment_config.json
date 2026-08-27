@@ -1,0 +1,78 @@
+{
+  "experiment": "Missing Boundary Guided Generation for DRAEM",
+  "category": "bottle",
+  "detector": "DRAEM",
+  "generator": "SeaS",
+  "feature_layers": ["b3", "b4", "b6"],
+  "mb_formula": "M(x) = alpha * Gap(x) + beta * PB(x)",
+  "alpha": 0.5,
+  "beta": 0.5,
+  "gap_k_neighbors": 10,
+  "percentile_threshold": 90,
+  "boundary_normal_prompt": "a ob1",
+  "blind_defect_prompt": "a ob1 with sks1 sks2 sks3 sks4",
+  "random_anomaly_prompt": "a ob1 with sks1 sks2 sks3 sks4 (seed 777)",
+  "generation_counts": {
+    "boundary_normal": 50,
+    "blind_defect": 50,
+    "random_anomalies_pool": 100,
+    "random_selected": 50
+  },
+  "random_selection_seed": 42,
+  "datasets": {
+    "A_baseline": {
+      "good": 209,
+      "anomaly": 0,
+      "description": "Original train/good"
+    },
+    "B_random": {
+      "good": 209,
+      "anomaly": 50,
+      "description": "Original + 50 random SeaS anomalies (seed 777 pool, seed 42 selection)"
+    },
+    "C_mb": {
+      "good": 209,
+      "boundary_normal": 50,
+      "blind_defect": 50,
+      "description": "Original + 50 Boundary Normal + 50 Blind Defect"
+    }
+  },
+  "retraining": {
+    "architecture": "same as baseline",
+    "epochs": 200,
+    "lr": 0.0001,
+    "batch_size": 8,
+    "note": "Baseline was trained 700 epochs; retrain models use 200 epochs for comparison"
+  },
+  "timeline": "2026-08-12",
+  "status": "v3_closedloop_active",
+  "v2_corrections": {
+    "fix1_m_guided_generation": {
+      "status": "superseded_by_v3",
+      "script": "src/generate_mb_guided.py",
+      "approach": "per-sample M(x)-guided generation (open-loop)",
+      "verified": "generated M(x) never checked; empirically refs drift (gap 0.10->0.27), M~0.15 only coincidentally near P90"
+    },
+    "fix2_bd_training": {
+      "status": "not_started",
+      "approach": "dual-stream loader (reference MirrorEM train_draem_with_mirrorem.py)",
+      "bd_images": "outputs/generated_v3/bottle/blind_defect/*/acc_*.png + acc_*_mask.png"
+    }
+  },
+  "v3_closedloop": {
+    "mb_definition": "M(x) = alpha*Gap_norm + beta*PB, Gap fixed P1/P99 anchor, PB=KDE-PB(bandwidth=0.1)",
+    "oracle": "outputs/features/bottle/missing_boundary/mx_oracle/oracle.pkl",
+    "script": "src/generate_mb_closedloop.py",
+    "approach": "generate -> score(M) -> accept/reject (M gate + RMP mask content gate) -> adaptive noise ladder",
+    "bn_gate": "M >= m_accept_bn (0.7166) AND mask_cov < 0.05 (normal content)",
+    "bd_gate": "M >= m_accept_bd (0.8009) AND mask_cov > 0.05 (defect present) AND score in [0.5,0.995]",
+    "small_validation": {
+      "run": "2026-08-12, 1 BN ref + 1 BD ref, 20 candidates -> 16 accepted",
+      "accepted_M_mean": 1.30,
+      "bn_mask_cov_mean": 0.008,
+      "bd_mask_cov_mean": 0.330
+    },
+    "output_dir": "outputs/generated_v3"
+  },
+  "next_steps_doc": "NEXT_STEPS.md"
+}

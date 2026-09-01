@@ -6,7 +6,8 @@ M(x)-Guided SeaS Generation (v2)
 
 对每个高-M Boundary Normal 样本 x_i:
   - 单独用 x_i 作为 ref (ref 目录只放 x_i)
-  - 低 add_noise_step → 生成贴近 x_i 的变体 (落在高-M 区域)
+  - add_noise_step 用 SeaS 官方默认 1500 (低于 1500 会产大片暗色块, 实测 300~1200
+    全黑; "低 noise 贴近参考图" 是误解, BN/BD 的区别靠 prompt 而非 noise)
   - 正常 prompt "a ob1"
   输出: boundary_normal/sample_{i}/ (含 meta.json 记录源 M, ref, prompt)
 
@@ -20,7 +21,7 @@ M(x)-Guided SeaS Generation (v2)
   - source_img: 参考图路径
   - prompt, add_noise_step
 """
-import argparse, os, sys, json, shutil, subprocess, time
+import argparse, os, re, sys, json, shutil, subprocess, time
 from glob import glob
 from concurrent.futures import ThreadPoolExecutor
 
@@ -67,21 +68,43 @@ def build_seas_cmd(seas_python, seas_dir, output_dir, ref_dir, prompt,
     return cmd
 
 
-def make_temp_config(seas_dir, add_noise_step, tag):
+def guidance_from_dataset(dataset_dir):
+    """Map a dataset directory to the SeaS guidance_scale it needs.
+
+    SeaS configs/seas.yaml documents the per-dataset values:
+        MVTec AD   -> 8
+        VisA       -> 2
+        MVTec 3D AD -> 5
+    Missing Boundary can run on any of the three, so generation must not
+    silently reuse the MVTec default for VisA: guidance=8 on VisA produces
+    pixel-block / noisy images (verified in the SeaS subtype experiment).
     """
-    Create a temp seas.yaml config with custom add_noise_step.
-    SeaS load_args reads add_noise_step / batch_size etc. from config.
+    p = (dataset_dir or '').lower()
+    if 'visa' in p:
+        return 2
+    if '3d' in p:
+        return 5
+    return 8
+
+
+def make_temp_config(seas_dir, add_noise_step, tag, guidance=None):
+    """
+    Create a temp seas.yaml config with custom add_noise_step (and optionally
+    guidance_scale). SeaS load_args reads add_noise_step / guidance_scale etc.
+    from the config and OVERWRITES the CLI values, so they must be set here.
     gpu_id is set to null so the CLI --gpu_id (per-worker) takes effect.
     """
     src_config = os.path.join(seas_dir, 'configs', 'seas.yaml')
     with open(src_config) as f:
         content = f.read()
-    import re
     content = re.sub(r'(add_noise_step:\s*)\d+', f'\\g<1>{add_noise_step}', content)
+    if guidance is not None:
+        content = re.sub(r'(guidance_scale:\s*)\d+', f'\\g<1>{guidance}', content)
     content = re.sub(r'(gpu_id:\s*)\S+', 'gpu_id: null', content)
     # device must be cuda:0 because CUDA_VISIBLE_DEVICES remaps the physical GPU
     content = re.sub(r'(device:\s*["\']?)cuda:\d+(["\']?)', r'\1cuda:0\2', content)
-    tmp_path = f'/tmp/seas_mb_{tag}_{add_noise_step}.yaml'
+    g_tag = f'_g{guidance}' if guidance is not None else ''
+    tmp_path = f'/tmp/seas_mb_{tag}_{add_noise_step}{g_tag}.yaml'
     with open(tmp_path, 'w') as f:
         f.write(content)
     return tmp_path
@@ -172,10 +195,13 @@ def main():
                         help='Number of boundary-normal samples to generate for')
     parser.add_argument('--num_bd', type=int, default=10,
                         help='Number of blind-defect samples to generate for')
-    parser.add_argument('--bn_noise_step', type=int, default=500,
-                        help='add_noise_step for boundary normal (low = close to ref)')
+    parser.add_argument('--bn_noise_step', type=int, default=1500,
+                        help='add_noise_step for boundary normal (SeaS 官方默认 1500; <1500 产暗色块)')
     parser.add_argument('--bd_noise_step', type=int, default=1500,
                         help='add_noise_step for blind defect')
+    parser.add_argument('--guidance', type=float, default=None,
+                        help='SeaS guidance_scale override (default: inferred from '
+                             'dataset_dir — MVTec AD=8, VisA=2, MVTec 3D AD=5)')
     args = parser.parse_args()
 
     with open(args.high_m_json) as f:
@@ -191,12 +217,14 @@ def main():
     gpu_list = [int(g) for g in args.gpus.split(',')]
     os.makedirs(os.path.join(args.output_dir, args.category), exist_ok=True)
 
-    # Create temp configs to control add_noise_step (SeaS config overrides CLI)
-    bn_config = make_temp_config(args.seas_dir, args.bn_noise_step, 'bn')
-    bd_config = make_temp_config(args.seas_dir, args.bd_noise_step, 'bd')
+    # Create temp configs to control add_noise_step AND guidance_scale
+    # (SeaS load_args overrides both from the config, so CLI values are ignored).
+    guidance = args.guidance if args.guidance is not None else guidance_from_dataset(args.dataset_dir)
+    bn_config = make_temp_config(args.seas_dir, args.bn_noise_step, 'bn', guidance=guidance)
+    bd_config = make_temp_config(args.seas_dir, args.bd_noise_step, 'bd', guidance=guidance)
 
     jobs = []
-    # Boundary Normal: low noise step, normal prompt, high-M normal refs
+    # Boundary Normal: 官方 1500 noise step, normal prompt, high-M normal refs
     for i, sample in enumerate(bn_samples):
         jobs.append(('boundary_normal', sample, 'a ob1', bn_config))
     # Blind Defect: standard noise step, anomaly prompt, high-M refs
@@ -204,7 +232,8 @@ def main():
         jobs.append(('blind_defect', sample, 'a ob1 with sks1 sks2 sks3 sks4', bd_config))
 
     print(f"Total jobs: {len(jobs)} (BN={len(bn_samples)}, BD={len(bd_samples)})")
-    print(f"GPUs: {gpu_list}, BN noise_step={args.bn_noise_step}, BD noise_step={args.bd_noise_step}")
+    print(f"GPUs: {gpu_list}, BN noise_step={args.bn_noise_step}, BD noise_step={args.bd_noise_step}, "
+          f"guidance={guidance} (dataset: {args.dataset_dir})")
 
     def worker(idx_job):
         idx, (kind, sample, prompt, config_path) = idx_job
@@ -235,6 +264,8 @@ def main():
         'num_succeeded': len(done),
         'bn_noise_step': args.bn_noise_step,
         'bd_noise_step': args.bd_noise_step,
+        'guidance': guidance,
+        'dataset_dir': args.dataset_dir,
         'num_variants': args.num_variants,
         'samples': done,
     }

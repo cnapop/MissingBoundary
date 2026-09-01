@@ -7,8 +7,9 @@ build_candidate_pool.py — Selection Study Phase A
   shape (num_components/max_comp/compactness/aspect) 等 → candidate.csv。
 
 对每个 train 高-M 正常参考图:
-  - BN-style (正常 prompt, 低 noise 阶梯)   → 边界正常候选
-  - BD-style (异常 prompt, 高 noise 阶梯)   → 缺陷候选
+  - BN-style (正常 prompt, 官方 1500~1800 noise 阶梯)   → 边界正常候选
+  - BD-style (异常 prompt, 同 noise 阶梯)   → 缺陷候选
+注意: add_noise_step 必须 >= 1500 (SeaS 官方默认), 更低会产出大片暗色块。
 每个 (ref, kind, noise) 生成一个 SeaS batch (num_variants 张), 逐张评分并保留
 image/ + mask/ 到 pool (供后续 selector 引用训练)。**不做任何接受/拒绝过滤** ——
 这是与闭环生成的关键区别: 闭环只留接受样本, 本研究需要全谱候选。
@@ -32,7 +33,7 @@ from PIL import Image
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from mx_oracle import MxOracle
-from generate_mb_guided import build_seas_cmd, make_temp_config
+from generate_mb_guided import build_seas_cmd, make_temp_config, guidance_from_dataset
 
 AREA_THR = 128          # mask > 128 视为缺陷像素
 AMAP_THR = 0.5          # amap 二值阈值 (与 oracle.amap_cov 一致)
@@ -132,7 +133,8 @@ class PoolBuilder:
     def _gen_batch(self, kind, prompt, noise, seed, ref_dir):
         """调 SeaS 生成一批候选, 返回 (image_paths, mask_paths) + batch_dir."""
         gpu_id = self._next_gpu()
-        config_path = make_temp_config(self.args.seas_dir, noise, f'pool_{kind}_{gpu_id}')
+        config_path = make_temp_config(self.args.seas_dir, noise, f'pool_{kind}_{gpu_id}',
+                                       guidance=self.args.guidance)
         num = max(self.args.num_variants, 10)
         cmd = build_seas_cmd(
             self.args.seas_python, self.args.seas_dir, '', ref_dir, prompt,
@@ -250,8 +252,12 @@ def main():
     parser.add_argument('--score_gpu', type=int, default=7)
     parser.add_argument('--num_refs', type=int, default=20)
     parser.add_argument('--num_variants', type=int, default=10)
-    parser.add_argument('--bn_noise', default='300,500,700')
-    parser.add_argument('--bd_noise', default='1200,1500,1800')
+    # BN/BD 都用 SeaS 官方验证的 add_noise_step=1500 起步 (seas.yaml 默认)。
+    # add_noise_step < 1500 产大片暗色块 (实测 300~1200 全黑, 连 g2 的 bd_1200 也是
+    # 坏的, 见 selection_pool_g2 bn/bd 质量诊断)。BN/BD 的区别只靠 prompt
+    # (正常 vs sks 异常), noise 区间相同。
+    parser.add_argument('--bn_noise', default='1500,1650,1800')
+    parser.add_argument('--bd_noise', default='1500,1650,1800')
     parser.add_argument('--max_workers', type=int, default=3)
     args = parser.parse_args()
 
@@ -264,6 +270,10 @@ def main():
                                  args.category, 'mask-checkpoint', 'rmp')
     args.sd_path = os.path.join(args.seas_dir, 'model_hub', 'stable-diffusion-v1-4')
     args.dataset_dir = os.path.abspath(args.dataset_dir)
+    # SeaS load_args 从 config 读取 guidance_scale (覆盖 CLI), 故按数据集推断并写入 temp config.
+    # MVTec AD=8, VisA=2, MVTec 3D AD=5 (见 generate_mb_guided.guidance_from_dataset).
+    args.guidance = guidance_from_dataset(args.dataset_dir)
+    print(f"guidance_scale={args.guidance} (dataset_dir={args.dataset_dir})")
 
     with open(args.high_m_json) as f:
         high_m = json.load(f)

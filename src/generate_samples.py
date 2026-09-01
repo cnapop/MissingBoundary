@@ -13,6 +13,9 @@ import argparse, os, sys, json, shutil, subprocess, csv
 import numpy as np
 from glob import glob
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from generate_mb_guided import make_temp_config, guidance_from_dataset
+
 
 def load_high_m_regions(json_path):
     with open(json_path, 'r') as f:
@@ -38,7 +41,8 @@ def copy_reference_images(reference_paths, target_dir, prefix=''):
 
 def generate_boundary_normal(seas_python, seas_dir, category, output_dir,
                               gen_model_path, rmp_model_path, sd_model_path,
-                              ref_images, num_samples=100, gpu_id=0):
+                              ref_images, num_samples=100, gpu_id=0,
+                              dataset_dir=None, config_path=None):
     """
     生成 Boundary Normal 样本:
     以高-M 的正常图为参考，生成 "正常但靠近决策边界" 的变体。
@@ -57,7 +61,7 @@ def generate_boundary_normal(seas_python, seas_dir, category, output_dir,
     os.makedirs(bn_ref_dir)
 
     # Copy reference normal images
-    dataset_dir = '/data/chenjiawen/Datasets/MVTec-AD'
+    dataset_dir = dataset_dir or '/data/chenjiawen/Datasets/MVTec-AD'
     normal_dir = os.path.join(dataset_dir, category, 'train', 'good')
 
     # Resolve image names from various formats to actual files
@@ -104,9 +108,11 @@ def generate_boundary_normal(seas_python, seas_dir, category, output_dir,
     # This generates normal-looking variations of the boundary-adjacent references.
     prompt = "a ob1"
 
-    # Run SeaS inference
+    # Run SeaS inference. guidance_scale must go through the temp config:
+    # SeaS load_args reads it from the config and OVERWRITES the CLI value.
     cmd = [
         seas_python, os.path.join(seas_dir, 'examples', 'SeaS_infer.py'),
+        '--config', config_path,
         '--output_dir', bn_output,
         '--ref_data_dir', bn_ref_dir,
         '--gen_model_path', gen_model_path,
@@ -115,7 +121,6 @@ def generate_boundary_normal(seas_python, seas_dir, category, output_dir,
         '--prompt', prompt,
         '--total_infer_num', str(num_samples),
         '--num_inference_steps', '25',
-        '--guidance_scale', '8',
         '--threshold', '0.2',
         '--seed_start', '42',
         '--gpu_id', str(gpu_id),
@@ -155,7 +160,8 @@ def generate_boundary_normal(seas_python, seas_dir, category, output_dir,
 
 def generate_blind_defect(seas_python, seas_dir, category, output_dir,
                            gen_model_path, rmp_model_path, sd_model_path,
-                           high_m_samples, num_samples=100, gpu_id=0):
+                           high_m_samples, num_samples=100, gpu_id=0,
+                           dataset_dir=None, config_path=None):
     """
     生成 Blind Defect 样本:
     利用 SeaS 生成微小/难检测的异常样本。
@@ -168,7 +174,7 @@ def generate_blind_defect(seas_python, seas_dir, category, output_dir,
     os.makedirs(bd_output, exist_ok=True)
 
     # Use normal images as reference (for anomaly generation)
-    dataset_dir = '/data/chenjiawen/Datasets/MVTec-AD'
+    dataset_dir = dataset_dir or '/data/chenjiawen/Datasets/MVTec-AD'
     normal_dir = os.path.join(dataset_dir, category, 'train', 'good')
 
     bd_ref_dir = os.path.abspath(os.path.join(output_dir, category, '_bd_refs'))
@@ -189,6 +195,7 @@ def generate_blind_defect(seas_python, seas_dir, category, output_dir,
 
     cmd = [
         seas_python, os.path.join(seas_dir, 'examples', 'SeaS_infer.py'),
+        '--config', config_path,
         '--output_dir', bd_output,
         '--ref_data_dir', bd_ref_dir,
         '--gen_model_path', gen_model_path,
@@ -197,7 +204,6 @@ def generate_blind_defect(seas_python, seas_dir, category, output_dir,
         '--prompt', prompt,
         '--total_infer_num', str(num_samples),
         '--num_inference_steps', '25',
-        '--guidance_scale', '8',
         '--threshold', '0.2',
         '--seed_start', '142',
         '--gpu_id', str(gpu_id),
@@ -250,9 +256,20 @@ def main():
                         help='Number of blind defect samples')
     parser.add_argument('--gpu_id', type=int, default=0,
                         help='GPU ID for SeaS generation')
+    parser.add_argument('--dataset_dir', type=str,
+                        default='/data/chenjiawen/Datasets/MVTec-AD',
+                        help='Dataset root (MVTec-AD / MVTec-3D-AD / VisA); '
+                             'determines SeaS guidance_scale (8 / 5 / 2)')
     parser.add_argument('--skip_boundary_normal', action='store_true')
     parser.add_argument('--skip_blind_defect', action='store_true')
     args = parser.parse_args()
+
+    # SeaS load_args reads guidance_scale from the config (overriding the CLI),
+    # so set it via a temp config inferred from the dataset.
+    guidance = guidance_from_dataset(args.dataset_dir)
+    bn_config = make_temp_config(args.seas_dir, 1500, 'samples_bn', guidance=guidance)
+    bd_config = make_temp_config(args.seas_dir, 1500, 'samples_bd', guidance=guidance)
+    print(f"guidance_scale={guidance} (dataset_dir={args.dataset_dir})")
 
     # Load high-M regions
     high_m = load_high_m_regions(args.high_m_json)
@@ -268,6 +285,7 @@ def main():
             args.seas_python, args.seas_dir, args.category, args.output_dir,
             args.gen_model_path, args.rmp_model_path, args.sd_model_path,
             bn_samples, args.num_boundary_normal, args.gpu_id,
+            dataset_dir=args.dataset_dir, config_path=bn_config,
         )
 
     # Task B: Blind Defect Generation
@@ -278,6 +296,7 @@ def main():
             args.seas_python, args.seas_dir, args.category, args.output_dir,
             args.gen_model_path, args.rmp_model_path, args.sd_model_path,
             bd_samples, args.num_blind_defect, args.gpu_id,
+            dataset_dir=args.dataset_dir, config_path=bd_config,
         )
 
     # Summary

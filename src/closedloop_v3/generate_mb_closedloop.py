@@ -29,7 +29,7 @@ from PIL import Image
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 from mx_oracle import MxOracle
-from generate_mb_guided import build_seas_cmd, make_temp_config
+from generate_mb_guided import build_seas_cmd, make_temp_config, guidance_from_dataset
 
 _SCORE_LOCK = threading.Lock()
 
@@ -72,7 +72,8 @@ class ClosedLoopWorker:
     def _gen_batch(self, kind, sample, prompt, noise_step, gpu_id, seed_start,
                    ref_dir, gen_dir):
         """调 SeaS 生成一批候选到独立 gen_dir, 返回 (image_paths, mask_paths)."""
-        config_path = make_temp_config(self.args.seas_dir, noise_step, f'{kind}_{gpu_id}')
+        config_path = make_temp_config(self.args.seas_dir, noise_step,
+                                       f'{kind}_{gpu_id}', guidance=self.args.guidance)
         num = max(self.args.num_variants, 10)  # SeaS 需要 >= batch_size(10)
         cmd = build_seas_cmd(
             self.args.seas_python, self.args.seas_dir, gen_dir, ref_dir, prompt,
@@ -326,6 +327,10 @@ def main():
     args.rmp_ckpt = args.rmp_ckpt or os.path.join(
         args.seas_dir, 'outputs', 'checkpoints', args.category, 'mask-checkpoint', 'rmp')
     args.sd_path = os.path.join(args.seas_dir, 'model_hub', 'stable-diffusion-v1-4')
+    # SeaS load_args 从 config 读取 guidance_scale (覆盖 CLI), 故按数据集推断并写入 temp config.
+    # MVTec AD=8, VisA=2, MVTec 3D AD=5 (见 generate_mb_guided.guidance_from_dataset).
+    args.guidance = guidance_from_dataset(args.dataset_dir)
+    print(f"guidance_scale={args.guidance} (dataset_dir={args.dataset_dir})")
 
     with open(args.high_m_json) as f:
         high_m = json.load(f)

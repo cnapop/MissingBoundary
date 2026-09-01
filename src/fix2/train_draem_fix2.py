@@ -187,6 +187,12 @@ def main():
     torch.manual_seed(args.seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(args.seed)
+    # 复现性修复 (2026-09-01): cuDNN 默认可能选非确定性卷积算法 (Winograd 等),
+    # 微小浮点差经 mirror-loss 反馈环放大 200 epoch 会把模型推向不同吸引子,
+    # 导致"同数据同 seed"训练产出行为差异巨大的模型 (selection study S2/S3/S9
+    # 验证: pixel AUC 0.25~0.60)。强制确定性算法后同数据同 seed 逐字节一致。
+    torch.backends.cudnn.deterministic = True
+    torch.use_deterministic_algorithms(True)
 
     sys.path.insert(0, str(Path(args.draem_repo).resolve()))
     from data_loader import MVTecDRAEMTrainDataset

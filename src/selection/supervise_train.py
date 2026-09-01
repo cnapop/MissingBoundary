@@ -25,10 +25,12 @@ import os, sys, time, json, subprocess, signal
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.join(ROOT, 'src', 'selection'))
-from run_study import SELECTOR_NAMES, train_cmd, SEL_ROOT
+from run_study import SELECTOR_NAMES, train_cmd, SEL_ROOT, CAT, BASE
 
 # 每卡最多并发 fix2 数 (实测每模型 ~10.7GB, 24.5GB 卡留 ~2GB 余量)
-CAPACITY = {0: 1, 1: 2, 2: 1, 6: 2, 7: 2}
+import json as _json
+DEFAULT_CAP = {0: 1, 1: 2, 2: 1, 6: 2, 7: 2}
+CAPACITY = _json.loads(os.environ.get('MB_CAPACITY', _json.dumps(DEFAULT_CAP)))
 POLL_S = 60
 LOG_DIR = os.path.join(SEL_ROOT, '_logs')
 
@@ -46,7 +48,7 @@ def main():
         log = os.path.join(LOG_DIR, f'{name}.train.log')
         # 崩溃残留的 epoch-0 checkpoint 由 --init-random 覆盖, 无害; 先清掉保证干净
         for p in ('_seg.pckl', '.pckl'):
-            f = os.path.join(ckpt, f'DRAEM_test_0.0001_200_bs8_pipe_fryum_{p}')
+            f = os.path.join(ckpt, f'{BASE}_{CAT}_{p}')
             if os.path.exists(f):
                 os.remove(f)
         with open(log, 'w') as f:

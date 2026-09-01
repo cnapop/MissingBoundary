@@ -15,20 +15,29 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 sys.path.insert(0, os.path.join(ROOT, 'src', 'selection'))
 from study_selectors import Pool, run_all, screening_stats, set_overlap
 
-CAT = 'pipe_fryum'
+CAT = os.environ.get('MB_CAT', 'pipe_fryum')
 K = 100
-GPUS = [0, 2, 6, 7]
+GPUS = [int(g) for g in os.environ.get('MB_GPUS', '0,2,6,7').split(',')]
 BASE = 'DRAEM_test_0.0001_200_bs8'
-POOL_CSV = os.path.join(ROOT, 'outputs', 'selection_pool', CAT, 'candidate.csv')
-SEL_ROOT = os.path.join(ROOT, 'outputs', 'selection')
+# 支持从环境变量覆盖候选池路径与结果根目录 (重跑 guidance=2 修正实验用):
+#   MB_POOL_CSV  -> 候选池 csv (默认 outputs/selection_pool/<CAT>/candidate.csv)
+#   MB_SEL_ROOT  -> 结果根目录 (默认 outputs/selection 或 selection_<CAT>)
+POOL_CSV = os.environ.get('MB_POOL_CSV',
+                          os.path.join(ROOT, 'outputs', 'selection_pool', CAT, 'candidate.csv'))
+SEL_ROOT = os.environ.get('MB_SEL_ROOT',
+                          os.path.join(ROOT, 'outputs', 'selection' if CAT == 'pipe_fryum'
+                                       else f'selection_{CAT}'))
 NORMAL_SRC = os.path.join(ROOT, 'outputs', 'visa_datasets', CAT, 'train', 'good')
 DTD_SRC = '/data/chenjiawen/DRAEM/datasets/dtd/images'
 DRAEM_REPO = '/data/chenjiawen/DRAEM'
 EVAL_SCRIPT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'eval_study.py')
 TEST_DATA = os.path.join(ROOT, 'outputs', 'visa_datasets')
 
-SELECTOR_NAMES = ['S0_random', 'S1_area', 'S2_m_only', 'S3_m_area', 'S4_m_score',
-                  'S5_m_topk', 'S6_m_region', 'S7_m_multi', 'S8_m_soft', 'S9_m_pareto']
+ALL_SELECTOR_NAMES = ['S0_random', 'S1_area', 'S2_m_only', 'S3_m_area', 'S4_m_score',
+                         'S5_m_topk', 'S6_m_region', 'S7_m_multi', 'S8_m_soft', 'S9_m_pareto']
+_sel_env = os.environ.get('MB_SELECTORS', 'all')
+SELECTOR_NAMES = (ALL_SELECTOR_NAMES if _sel_env == 'all'
+                  else [s for s in ALL_SELECTOR_NAMES if s in _sel_env.split(',')])
 
 
 def load_pool():
@@ -105,7 +114,7 @@ def train_cmd(name, gpu):
     normal_dir = os.path.join(out, 'train_good_plus_bn')
     ckpt = os.path.join(out, 'checkpoints', 'fix2')
     py = '/home/chenjiawen/anaconda3/envs/DRAEM/bin/python'
-    cmd = [py, os.path.join(ROOT, 'src', 'train_draem_fix2.py'),
+    cmd = [py, os.path.join(ROOT, 'src', 'fix2', 'train_draem_fix2.py'),
            '--manifest', manifest,
            '--normal-data-dir', normal_dir,
            '--anomaly-source-path', DTD_SRC,

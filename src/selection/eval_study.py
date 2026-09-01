@@ -104,6 +104,6 @@ if __name__ == "__main__":
     parser.add_argument('--data_path', action='store', type=str, required=True)
     parser.add_argument('--checkpoint_path', action='store', type=str, required=True)
     args = parser.parse_args()
-    obj_list = ["pipe_fryum"]
+    obj_list = [os.environ.get("MB_CAT", "pipe_fryum")]
     with torch.cuda.device(args.gpu_id):
         test(obj_list, args.data_path, args.checkpoint_path, args.base_model_name, args.gpu_id)

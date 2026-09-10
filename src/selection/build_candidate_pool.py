@@ -221,7 +221,7 @@ class PoolBuilder:
             jobs.append(('bd', 'a ob1 with sks1 sks2 sks3 sks4', noise))
 
         cands = []
-        seed = idx * 137
+        seed = self.args.seed_offset + idx * 137
         for kind, prompt, noise in jobs:
             seed += 10
             imgs, masks, batch_dir = self._gen_batch(
@@ -259,6 +259,9 @@ def main():
     parser.add_argument('--bn_noise', default='1500,1650,1800')
     parser.add_argument('--bd_noise', default='1500,1650,1800')
     parser.add_argument('--max_workers', type=int, default=3)
+    # 重生成实验: 平移每张参考图的推理 seed (默认 0 = 与历史池逐位一致).
+    # seed = seed_offset + idx*137, 每个 (参考图,noise) job 再 +10.
+    parser.add_argument('--seed_offset', type=int, default=0)
     args = parser.parse_args()
 
     args.bn_noise = [int(x) for x in args.bn_noise.split(',')]

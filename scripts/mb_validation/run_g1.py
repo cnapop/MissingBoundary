@@ -41,6 +41,9 @@ MIRROR_W = 0.5
 BS_FIX2 = 4
 BS_DRAEM = 8
 NUM_WORKERS_FIX2 = 4
+MIN_FREE_MIB = 20000   # 只挑基本空闲的卡 (24564 MiB 卡上占用 <4.5G)。
+                       # 单 run 只占 12626 MiB, 但阈值若贴着它设, 就会出现
+                       # "卡上已有一个 run (free ~13G) 仍判为可启动" → 两张挤一张卡。
 SEEDS = [0, 1, 2]
 CATS = ['fryum', 'pipe_fryum']
 
@@ -72,6 +75,17 @@ def is_active(cat, method, seed):
     d = os.path.join(rundir(cat, method, seed), 'checkpoint')
     r = subprocess.run(['pgrep', '-f', d], capture_output=True, text=True)
     return bool(r.stdout.strip())
+
+
+def gpu_free_mib(gpu):
+    """该 GPU 当前空闲显存 (MiB); 查不到返回 None。"""
+    try:
+        r = subprocess.run(
+            ['nvidia-smi', '--query-gpu=memory.free', '--format=csv,noheader,nounits',
+             '-i', str(gpu)], capture_output=True, text=True, timeout=15)
+        return int(r.stdout.strip().splitlines()[0])
+    except Exception:
+        return None
 
 
 def train_complete(cat, method, seed):
@@ -263,6 +277,12 @@ def main():
 
             for gpu in gpus:
                 if gpu in running or not todo:
+                    continue
+                # 显存闸门: 一个 DRAEM run 占 12.6G, 24G 卡上放两个直接 CUDA OOM。
+                # 需要它是因为 GPU 池里可能包含"外面正跑着我自己的 run"或别的组的卡
+                # —— 此时该 GPU 虽不在 running 里, 但显存已被占满。
+                free = gpu_free_mib(gpu)
+                if free is not None and free < MIN_FREE_MIB:
                     continue
                 job = next((c for c in todo
                             if not is_active(*c) and not train_complete(*c)), None)

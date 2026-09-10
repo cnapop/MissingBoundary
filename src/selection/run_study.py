@@ -7,7 +7,7 @@ run_study.py — Selection Study Phase B/D/E 驱动
   --phase eval   : 评估全部 10 个 checkpoint → 汇总对比表
 
 固定训练条件 (公平性): init-random, 200ep, lr1e-4, w0.5, bs4,
-  steps_per_epoch=138 (K=100 → pre=550), seed=42。
+  steps_per_epoch=auto (=ceil(pre/bs), VisA 各类 train 数不同), seed=42。
 """
 import argparse, os, sys, json, csv, glob, shutil, subprocess, time
 
@@ -121,8 +121,17 @@ def train_cmd(name, gpu):
            '--init-random', '--base-name', BASE, '--category', CAT,
            '--output-dir', ckpt,
            '--epochs', '200', '--lr', '0.0001', '--mirror-weight', '0.5',
-           '--batch-size', '4', '--steps-per-epoch', '138',
+           '--batch-size', '4',
            '--draem-repo', DRAEM_REPO, '--device', f'cuda:{gpu}', '--seed', '42']
+    # 并行 dataloader 加速 (MB_NUM_WORKERS>0 时启用):
+    #   num_workers=0 时增强在主进程串行 → 每步 ~0.6s (CPU-bound, GPU 空转);
+    #   >0 时增强在 worker 进程并行 → 每步 ~0.15s (GPU-bound), 约 3-4x 提速.
+    # 默认不设 (0), 与 pipe_fryum g3 历史训练一致; 编排器按需覆盖.
+    nw = os.environ.get('MB_NUM_WORKERS')
+    if nw:
+        cmd += ['--num-workers', nw]
+    # 注: 不再传 --steps-per-epoch, 由 train_draem_fix2 自动取 max(pre, mirror) loader
+    # 长度 → 每 epoch 恰好过一遍 pre 数据 (VisA 各类 train 数不同: 450~905)
     return cmd, ckpt
 
 

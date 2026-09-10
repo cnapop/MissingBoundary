@@ -88,6 +88,20 @@ def gpu_free_mib(gpu):
         return None
 
 
+def freest_gpu(gpus):
+    """挑空闲显存最多的卡用于评估。
+
+    不能写死 gpus[0]: 池里那张卡可能正跑着别的 run 或别的组的作业, 评估撞上去
+    会 CUDA OOM, 而失败后本 run 不会再重试 → 该 run 的 eval.json 永久缺失。
+    """
+    best, best_free = gpus[0], -1
+    for g in gpus:
+        f = gpu_free_mib(g)
+        if f is not None and f > best_free:
+            best, best_free = g, f
+    return best
+
+
 def train_complete(cat, method, seed):
     """train.log 是否已打印到最后一个 epoch —— 区分"训完待评估"与"没训/训一半"。
 
@@ -336,7 +350,7 @@ def main():
                     continue
                 if not train_complete(*job) or job in eval_failed:
                     continue
-                gpu = gpus[0]
+                gpu = freest_gpu(gpus)
                 metric, err = run_eval(cat, gpu, out)
                 if metric:
                     print(f"  [eval]  {cat}/{method}/seed{seed} "

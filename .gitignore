@@ -8,6 +8,10 @@ outputs/
 logs/
 *.log
 
+# ---- 实验产物: 只留轻量元数据, 检查点/事件文件不入库 ----
+experiments/**/checkpoint/
+events.out.tfevents.*
+
 # ---- Python 缓存 ----
 __pycache__/
 *.py[cod]
